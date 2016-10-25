@@ -33,8 +33,8 @@ for i in range (params.n):
     rspec.addResource(node)
     iface = node.addInterface("if"+str(i))
     link.addInterface(iface)
-    node.addService(rspec.Install(url="https://github.com/daidong/CloudLab2OpenHPC/archive/master.zip", path="/local"))
-    node.addService(rspec.Execute(shell="bash", command="/local/install.sh"))
+    node.addService(pg.Install(url="https://github.com/daidong/CloudLab2OpenHPC/archive/master.zip", path="/local"))
+    node.addService(pg.Execute(shell="bash", command="/local/install.sh"))
 
     
 rspec.addResource(link)
