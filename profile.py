@@ -20,13 +20,22 @@ if params.n < 1 or params.n > 128:
 # Create nodes and links
 link = pg.LAN("lan")
 
+disk_image_ubuntu_1204_1 = "urn:publicid:IDN+emulab.net+image+emulab-ops:UBUNTU12-64-STD"
+disk_image_centos_71_64 = "urn:publicid:IDN+emulab.net+image+emulab-ops:CENTOS71-64-STD"
+
 for i in range (params.n):
     node = pg.RawPC("node"+str(i))
     node.hardware_type = "r320"
-    node.disk_image="urn:publicid:IDN+emulab.net+image+emulab-ops:UBUNTU12-64-STD"
+    node.disk_image=disk_image_centos_71_64
+    bs = node.Blockstore("bs", "/local")
+    bs.size = "60GB"
+
     rspec.addResource(node)
     iface = node.addInterface("if"+str(i))
     link.addInterface(iface)
+    node.addService(rspec.Install(url="https://github.com/daidong/CloudLab2OpenHPC/archive/master.zip", path="/local"))
+    node.addService(rspec.Execute(shell="bash", command="/local/install.sh"))
+
     
 rspec.addResource(link)
 
