@@ -6,7 +6,7 @@ pc = portal.Context()
 
 # Describe the parameter this profile script can accept
 pc.defineParameter("n", "Number of Raw machines", portal.ParameterType.INTEGER, 1)
-pc.defineParameter("i", "Machine Image", portal.ParameterType.INTEGER, 1)
+pc.defineParameter("i", "Machine Image: 0 is Ubuntu 12.04; 1 is Centos 7.1", portal.ParameterType.INTEGER, 1)
 
 # Retrieve the values the user specifies during instantiation
 params = pc.bindParameters()
@@ -27,18 +27,23 @@ else:
 # Create nodes and links
 link = pg.LAN("lan")
 
+# Add install and execute
+install = pg.Install(url="http://myweb.ttu.edu/ddai/codes/tool.tar.gz", path="/local")
+execute = pg.Execute(shell="bash", command="/local/CloudLab2OpenHPC/install.sh")
+
 for i in range (params.n):
     node = pg.RawPC("node"+str(i))
     node.hardware_type = "r320"
     node.disk_image=disk_image
     bs = node.Blockstore("bs", "/local")
     bs.size = "60GB"
-
-    rspec.addResource(node)
+    node.addService(install)
+    node.addService(execute)
+    
     iface = node.addInterface("if"+str(i))
     link.addInterface(iface)
-    node.addService(pg.Install(url="http://myweb.ttu.edu/ddai/codes/tool.tar.gz", path="/local"))
-    node.addService(pg.Execute(shell="bash", command="/local/CloudLab2OpenHPC/install.sh"))
+    rspec.addResource(node)
+
     
 rspec.addResource(link)
 
